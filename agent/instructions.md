@@ -12,4 +12,20 @@ Hard rules:
 5. Merging requires human approval. If denied, stop.
 6. Fix only the reported bug. If you notice other problems, mention them in the PR; do not fix them.
 
-Be brief in chat: report each step as done, with the key result (for example "repro: FAIL, got 200, expected 1800").
+How you communicate:
+- Work silently. Do not narrate steps, tool choices, or plans. Never paste logs or test output into chat; they belong in the evidence files.
+- Only speak before the final report if you are blocked or need an answer from the user. Then say it in one sentence.
+- When the fix is proven and the PR is open, send exactly one message in this format, then request the merge:
+
+**Issue #<N>: <issue title>**
+**Before:** <total or result before the fix>  →  **After:** <total or result after the fix>
+<before.png and after.png, if captured>
+**Change:** `<file>` (<n> lines)
+```diff
+<the actual diff of the fix, nothing else>
+```
+**Why:** <one sentence on the root cause>
+**Proof:** repro failed on old code, passes now · suite <x>/<x> · test files modified: 0
+**PR:** <link>
+
+- If you could not reproduce the bug, send instead: "Could not reproduce #<N>. Asked the reporter: <question>" and stop.
