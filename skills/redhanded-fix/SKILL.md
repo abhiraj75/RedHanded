@@ -29,8 +29,9 @@ The existing suite must pass before you change anything. If it does not, stop an
 ## 4. Capture the "before"
     python3 -m http.server 3000 >/dev/null 2>&1 &
     WITH_BROWSER=1 bash scripts/bootstrap-sandbox.sh
-    node scripts/capture.mjs "http://localhost:3000/?coupon=<CODE>" /tmp/before.png | tee /tmp/before.txt
-If the browser cannot be installed, skip screenshots and say so in the PR. Do not stop for this.
+    node scripts/capture.mjs "http://localhost:3000/?coupon=<CODE>" /tmp/before.png
+Keep the screenshot in /tmp. Never commit screenshots or logs to the repository.
+If the browser cannot be installed, skip screenshots and say so in the final report. Do not stop for this.
 
 ## 5. Fix
 - Edit files under `src/` only. Make the smallest change that fixes the reported bug. Fix nothing else.
@@ -38,18 +39,20 @@ If the browser cannot be installed, skip screenshots and say so in the PR. Do no
   If you believe an existing test is wrong, stop and say so. Do not edit it.
 
 ## 6. Prove it green
-    node --test repro/issue-<N>.test.js 2>&1 | tee /tmp/green.txt
-    npm test 2>&1 | tee /tmp/suite.txt
-    node scripts/capture.mjs "http://localhost:3000/?coupon=<CODE>" /tmp/after.png | tee /tmp/after.txt
-The repro check and the full suite must both pass.
+    node --test repro/issue-<N>.test.js
+    npm test
+    node scripts/capture.mjs "http://localhost:3000/?coupon=<CODE>" /tmp/after.png
+The repro check and the full suite must both pass. Note two one-line results only:
+the repro result on old code (for example "got 200, expected 1800") and the suite count.
 
-## 7. Publish the evidence
-- Create branch `redhanded/issue-<N>` and push, in one commit:
-  the `src/` change, `repro/issue-<N>.test.js`, and `evidence/issue-<N>/` containing
-  `red.txt`, `green.txt`, `suite.txt`, `before.txt`, `after.txt`.
-- Open a PR titled `RedHanded: fix #<N> <short title>` with sections:
-  Reproduction (red), Fix, Proof (green), Files changed, "Test files modified: 0".
+## 7. Publish
+- Create branch `redhanded/issue-<N>` and push ONE commit containing EXACTLY two files:
+  the `src/` change and `repro/issue-<N>.test.js`. Nothing else. No logs, no screenshots, no evidence files.
+- Open a PR titled `RedHanded: fix #<N> <short title>` with this description and nothing more:
 
-## 8. Ask to ship
-- Request the merge. It requires human approval. If approval is denied, stop and comment why on the PR.
-- Never merge any PR you did not open with complete evidence.
+      Fixes #<N>
+      **Before:** <result before>  →  **After:** <result after>
+      **Root cause:** <one sentence>
+      **Proof:** `repro/issue-<N>.test.js` failed on main (<one-line result>), passes on this branch · suite <x>/<x> · test files modified: 0
+
+- Show /tmp/before.png and /tmp/after.png in the chat.
